@@ -10,7 +10,9 @@ cask "reponest" do
   name "RepoNest"
   desc "Local-first code project context base"
   homepage "https://github.com/sky-jiangcheng/RepoNest"
-  license "MIT"
+  # NOTE: no `license` stanza — that is a Formula method, not a Cask one.
+  # `brew install --cask` rejects the whole definition with
+  # "undefined method 'license' for Cask". The license is MIT; see README.
 
   on_arm do
     url "https://github.com/sky-jiangcheng/RepoNest/releases/download/v#{version}/reponest-darwin-arm64.dmg"
