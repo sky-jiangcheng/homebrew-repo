@@ -1,12 +1,16 @@
 name: Tests
 
-# A tap is only useful if the manifests actually install. This runs the real
-# thing on every push: install each manifest and run its test.
+# A tap is only useful if the manifests actually install, and the commands in
+# the main repo's README are the ones users will copy. So this does not poke at
+# Homebrew's internal paths: it runs the documented flow end to end —
 #
-# Deliberately NOT `brew audit --strict`: that checks style and deprecations,
-# and a tap that fails CI over formatting is a tap people learn to ignore. The
-# failure mode that matters is a manifest that does not install or whose digest
-# does not match, and `brew install` + `brew test` catch exactly that.
+#     brew tap sky-jiangcheng/homebrew-repo
+#     brew install --cask sky-jiangcheng/homebrew-repo/reponest
+#
+# Only $GITHUB_REPOSITORY is used, which GitHub always sets. The setup action
+# keeps HOMEBREW_REPOSITORY as an unexported shell variable, so referencing
+# "$HOMEBREW_REPOSITORY" in a later step expands to an empty string and brew
+# silently looks for "/formula/reponest-mcp.rb".
 on:
   push:
     branches: [main, master]
@@ -25,31 +29,34 @@ jobs:
     name: Cask (macOS)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v7
-
-      # Pinned to a tag rather than a branch. Homebrew/actions renamed its
-      # default branch to `main`, so the widely-copied `@master` reference fails
-      # at action-resolution time with "unable to find version `master`" before
-      # a single step runs. A tag cannot be renamed out from under us.
+      # Pinned to a branch that exists. Homebrew/actions renamed its default
+      # branch to `main`, so the widely-copied `@master` reference fails during
+      # action resolution, before a single step runs.
       - name: Set up Homebrew
         id: brew
         uses: Homebrew/actions/setup-homebrew@main
 
-      # The action exposes `gems-path` / `gems-hash`, NOT `cache-path`.
       - name: Cache Homebrew gems
         uses: actions/cache@v4
         with:
           path: ${{ steps.brew.outputs.gems-path }}
           key: ${{ runner.os }}-brew-${{ steps.brew.outputs.gems-hash }}
 
+      - name: Tap this repository
+        run: brew tap "$GITHUB_REPOSITORY"
+
       - name: brew install (cask)
-        run: brew install --cask "$HOMEBREW_REPOSITORY"/Casks/reponest.rb
+        run: brew install --cask "$GITHUB_REPOSITORY/reponest"
 
       - name: brew test (cask)
-        run: brew test --cask "$HOMEBREW_REPOSITORY"/reponest
+        run: brew test --cask "$GITHUB_REPOSITORY/reponest"
 
+      # `brew audit` without --strict: --strict checks style and deprecated DSL,
+      # and a tap whose CI goes red over formatting teaches people to ignore
+      # red. The failures that matter — wrong digest, missing artifact — are
+      # already caught by install and test above.
       - name: brew audit (cask)
-        run: brew audit --cask "$HOMEBREW_REPOSITORY"/reponest || true
+        run: brew audit --cask "$GITHUB_REPOSITORY/reponest" || true
 
   formula:
     name: Formula (${{ matrix.os }})
@@ -59,8 +66,6 @@ jobs:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v7
-
       - name: Set up Homebrew
         id: brew
         uses: Homebrew/actions/setup-homebrew@main
@@ -71,14 +76,17 @@ jobs:
           path: ${{ steps.brew.outputs.gems-path }}
           key: ${{ runner.os }}-brew-${{ steps.brew.outputs.gems-hash }}
 
+      - name: Tap this repository
+        run: brew tap "$GITHUB_REPOSITORY"
+
       - name: brew install (formula)
-        run: brew install "$HOMEBREW_REPOSITORY"/Formula/reponest-mcp.rb
+        run: brew install "$GITHUB_REPOSITORY/reponest-mcp"
 
       # The Formula's test block asserts the binary is present and executable
       # rather than running it: reponest-mcp is a stdio MCP server and would
       # block on the JSON-RPC loop with no client attached.
       - name: brew test (formula)
-        run: brew test "$HOMEBREW_REPOSITORY"/reponest-mcp
+        run: brew test "$GITHUB_REPOSITORY/reponest-mcp"
 
       - name: brew audit (formula)
-        run: brew audit --formula "$HOMEBREW_REPOSITORY"/reponest-mcp || true
+        run: brew audit --formula "$GITHUB_REPOSITORY/reponest-mcp" || true
