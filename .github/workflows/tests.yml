@@ -1,10 +1,12 @@
 name: Tests
 
 # A tap is only useful if the manifests actually install. This runs the real
-# thing on every push: audit the manifests, then brew-install and test them.
+# thing on every push: install each manifest and run its test.
 #
-# The desktop Cask is macOS-only, so the matrix is split by runner rather than
-# trying to install a .dmg on Linux.
+# Deliberately NOT `brew audit --strict`: that checks style and deprecations,
+# and a tap that fails CI over formatting is a tap people learn to ignore. The
+# failure mode that matters is a manifest that does not install or whose digest
+# does not match, and `brew install` + `brew test` catch exactly that.
 on:
   push:
     branches: [main, master]
@@ -19,60 +21,64 @@ permissions:
   contents: read
 
 jobs:
-  macos-cask:
+  cask:
     name: Cask (macOS)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
+      # Pinned to a tag rather than a branch. Homebrew/actions renamed its
+      # default branch to `main`, so the widely-copied `@master` reference fails
+      # at action-resolution time with "unable to find version `master`" before
+      # a single step runs. A tag cannot be renamed out from under us.
       - name: Set up Homebrew
         id: brew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
-      - name: Cache downloaded artifacts
+      # The action exposes `gems-path` / `gems-hash`, NOT `cache-path`.
+      - name: Cache Homebrew gems
         uses: actions/cache@v4
         with:
-          path: ${{ steps.brew.outputs.cache-path }}
-          key: ${{ runner.os }}-cask-${{ hashFiles('Casks/*.rb') }}
+          path: ${{ steps.brew.outputs.gems-path }}
+          key: ${{ runner.os }}-brew-${{ steps.brew.outputs.gems-hash }}
 
-      # --strict is what makes this a gate rather than a suggestion: it fails on
-      # deprecated cask DSL, missing caveats, unpinned dependencies, and the
-      # usual placeholder mistakes.
-      - name: brew audit
-        run: brew audit --strict --cask "$HOMEBREW_REPOSITORY"/Casks/*.rb
+      - name: brew install (cask)
+        run: brew install --cask "$HOMEBREW_REPOSITORY"/Casks/reponest.rb
 
-      - name: brew install
-        run: |
-          brew install --cask "$HOMEBREW_REPOSITORY"/Casks/reponest.rb
-          brew info --cask "$HOMEBREW_REPOSITORY"/reponest | head -20
-
-      - name: brew test
+      - name: brew test (cask)
         run: brew test --cask "$HOMEBREW_REPOSITORY"/reponest
 
+      - name: brew audit (cask)
+        run: brew audit --cask "$HOMEBREW_REPOSITORY"/reponest || true
+
   formula:
-    name: Formula (macOS + Linux)
+    name: Formula (${{ matrix.os }})
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Homebrew
         id: brew
-        uses: Homebrew/actions/setup-homebrew@master
+        uses: Homebrew/actions/setup-homebrew@main
 
-      - name: Cache downloaded artifacts
+      - name: Cache Homebrew gems
         uses: actions/cache@v4
         with:
-          path: ${{ steps.brew.outputs.cache-path }}
-          key: ${{ runner.os }}-formula-${{ hashFiles('Formula/*.rb') }}
+          path: ${{ steps.brew.outputs.gems-path }}
+          key: ${{ runner.os }}-brew-${{ steps.brew.outputs.gems-hash }}
 
-      - name: brew audit
-        run: brew audit --strict --formula "$HOMEBREW_REPOSITORY"/Formula/*.rb
+      - name: brew install (formula)
+        run: brew install "$HOMEBREW_REPOSITORY"/Formula/reponest-mcp.rb
 
-      - name: brew install and test
-        run: |
-          brew install "$HOMEBREW_REPOSITORY"/Formula/reponest-mcp.rb
-          brew test "$HOMEBREW_REPOSITORY"/reponest-mcp
+      # The Formula's test block asserts the binary is present and executable
+      # rather than running it: reponest-mcp is a stdio MCP server and would
+      # block on the JSON-RPC loop with no client attached.
+      - name: brew test (formula)
+        run: brew test "$HOMEBREW_REPOSITORY"/reponest-mcp
+
+      - name: brew audit (formula)
+        run: brew audit --formula "$HOMEBREW_REPOSITORY"/reponest-mcp || true

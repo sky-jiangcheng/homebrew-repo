@@ -33,4 +33,13 @@ cask "reponest" do
     "~/Library/Application Support/reponest",
     "~/Library/Logs/reponest.log",
   ]
+
+  # `brew test --cask` runs this. Without a block there is nothing to run, and
+  # the tap's CI cannot tell a working Cask from one that silently installed
+  # nothing. assert_app_installed is the idiomatic check for a .app Cask and is
+  # the assertion that would actually fail if the archive or the sha256 were
+  # wrong.
+  test do
+    assert_app_installed "RepoNest.app"
+  end
 end
