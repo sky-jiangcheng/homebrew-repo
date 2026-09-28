@@ -48,8 +48,29 @@ jobs:
       - name: brew install (cask)
         run: brew install --cask "$GITHUB_REPOSITORY/reponest"
 
-      - name: brew test (cask)
-        run: brew test --cask "$GITHUB_REPOSITORY/reponest"
+      # `brew test --cask` is not usable here: `test` is not a Cask DSL method
+      # in current Homebrew, so there is no test block for brew to run. Assert
+      # the installed layout directly instead — these are the same things a
+      # user would check after installing, and they fail if the DMG, the app
+      # name inside it, or the sha256 were wrong.
+      - name: verify installed app
+        run: |
+          set -euo pipefail
+          APP="/Applications/RepoNest.app"
+          if [ ! -d "$APP" ]; then
+            echo "::error::$APP was not installed"
+            ls -la /Applications || true
+            exit 1
+          fi
+          echo "app bundle present: $APP"
+          # Wails puts the executable at Contents/MacOS/<name>.
+          ls -la "$APP/Contents/MacOS/"
+          test -n "$(find "$APP/Contents/MacOS" -type f -perm -111 -print -quit)" \
+            || { echo "::error::no executable inside the app bundle"; exit 1; }
+          echo "app contains an executable"
+          # The Info.plist should carry the product name, proving the DMG held
+          # the real Wails bundle and not some stray .app.
+          /usr/libexec/PlistBuddy -c "Print :CFBundleName" "$APP/Contents/Info.plist"
 
       # `brew audit` without --strict: --strict checks style and deprecated DSL,
       # and a tap whose CI goes red over formatting teaches people to ignore
