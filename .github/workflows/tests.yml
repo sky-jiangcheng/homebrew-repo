@@ -1,0 +1,78 @@
+name: Tests
+
+# A tap is only useful if the manifests actually install. This runs the real
+# thing on every push: audit the manifests, then brew-install and test them.
+#
+# The desktop Cask is macOS-only, so the matrix is split by runner rather than
+# trying to install a .dmg on Linux.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  macos-cask:
+    name: Cask (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        id: brew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Cache downloaded artifacts
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.brew.outputs.cache-path }}
+          key: ${{ runner.os }}-cask-${{ hashFiles('Casks/*.rb') }}
+
+      # --strict is what makes this a gate rather than a suggestion: it fails on
+      # deprecated cask DSL, missing caveats, unpinned dependencies, and the
+      # usual placeholder mistakes.
+      - name: brew audit
+        run: brew audit --strict --cask "$HOMEBREW_REPOSITORY"/Casks/*.rb
+
+      - name: brew install
+        run: |
+          brew install --cask "$HOMEBREW_REPOSITORY"/Casks/reponest.rb
+          brew info --cask "$HOMEBREW_REPOSITORY"/reponest | head -20
+
+      - name: brew test
+        run: brew test --cask "$HOMEBREW_REPOSITORY"/reponest
+
+  formula:
+    name: Formula (macOS + Linux)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Homebrew
+        id: brew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Cache downloaded artifacts
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.brew.outputs.cache-path }}
+          key: ${{ runner.os }}-formula-${{ hashFiles('Formula/*.rb') }}
+
+      - name: brew audit
+        run: brew audit --strict --formula "$HOMEBREW_REPOSITORY"/Formula/*.rb
+
+      - name: brew install and test
+        run: |
+          brew install "$HOMEBREW_REPOSITORY"/Formula/reponest-mcp.rb
+          brew test "$HOMEBREW_REPOSITORY"/reponest-mcp
