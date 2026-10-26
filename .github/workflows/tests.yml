@@ -5,12 +5,12 @@ name: Tests
 # Homebrew's internal paths: it runs the documented flow end to end —
 #
 #     brew tap sky-jiangcheng/homebrew-repo
-#     brew install --cask sky-jiangcheng/homebrew-repo/reponest
+#     brew install --cask sky-jiangcheng/homebrew-repo/repotory
 #
 # Only $GITHUB_REPOSITORY is used, which GitHub always sets. The setup action
 # keeps HOMEBREW_REPOSITORY as an unexported shell variable, so referencing
 # "$HOMEBREW_REPOSITORY" in a later step expands to an empty string and brew
-# silently looks for "/formula/reponest-mcp.rb".
+# silently looks for "/formula/repotory-mcp.rb".
 on:
   push:
     branches: [main, master]
@@ -46,7 +46,7 @@ jobs:
         run: brew tap "$GITHUB_REPOSITORY"
 
       - name: brew install (cask)
-        run: brew install --cask "$GITHUB_REPOSITORY/reponest"
+        run: brew install --cask "$GITHUB_REPOSITORY/repotory"
 
       # `brew test --cask` is not usable here: `test` is not a Cask DSL method
       # in current Homebrew, so there is no test block for brew to run. Assert
@@ -56,7 +56,7 @@ jobs:
       - name: verify installed app
         run: |
           set -euo pipefail
-          APP="/Applications/RepoNest.app"
+          APP="/Applications/repotory.app"
           if [ ! -d "$APP" ]; then
             echo "::error::$APP was not installed"
             ls -la /Applications || true
@@ -77,7 +77,7 @@ jobs:
       # red. The failures that matter — wrong digest, missing artifact — are
       # already caught by install and test above.
       - name: brew audit (cask)
-        run: brew audit --cask "$GITHUB_REPOSITORY/reponest" || true
+        run: brew audit --cask "$GITHUB_REPOSITORY/repotory" || true
 
   formula:
     name: Formula (${{ matrix.os }})
@@ -101,13 +101,13 @@ jobs:
         run: brew tap "$GITHUB_REPOSITORY"
 
       - name: brew install (formula)
-        run: brew install "$GITHUB_REPOSITORY/reponest-mcp"
+        run: brew install "$GITHUB_REPOSITORY/repotory-mcp"
 
       # The Formula's test block asserts the binary is present and executable
-      # rather than running it: reponest-mcp is a stdio MCP server and would
+      # rather than running it: repotory-mcp is a stdio MCP server and would
       # block on the JSON-RPC loop with no client attached.
       - name: brew test (formula)
-        run: brew test "$GITHUB_REPOSITORY/reponest-mcp"
+        run: brew test "$GITHUB_REPOSITORY/repotory-mcp"
 
       - name: brew audit (formula)
-        run: brew audit --formula "$GITHUB_REPOSITORY/reponest-mcp" || true
+        run: brew audit --formula "$GITHUB_REPOSITORY/repotory-mcp" || true
