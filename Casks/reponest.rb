@@ -17,7 +17,9 @@ cask "reponest" do
   name "Repotory"
   desc "Local-first code project context base"
   homepage "https://github.com/sky-jiangcheng/repotory"
-  license "MIT"
+  # NOTE: no `license` stanza — `license` is a FORMULA method, not a Cask
+  # one. `brew install --cask` rejects the whole definition with
+  # "undefined method 'license' for Cask". The license is MIT; see README.
 
   on_arm do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-darwin-arm64.dmg"

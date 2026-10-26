@@ -1,14 +1,26 @@
 # homebrew-repo
 
-Homebrew tap for [RepoNest](https://github.com/sky-jiangcheng/RepoNest) — the
+Homebrew tap for [Repotory](https://github.com/sky-jiangcheng/repotory) — the
 local-first code project context base.
 
 ## What is in here
 
 | Manifest | Package | Platform | Artifact |
 |----------|---------|----------|----------|
-| [`Casks/reponest.rb`](Casks/reponest.rb) | `reponest` | macOS | `reponest-darwin-<arch>.dmg` — the Wails desktop app |
-| [`Formula/reponest-mcp.rb`](Formula/reponest-mcp.rb) | `reponest-mcp` | macOS + Linux | `reponest-mcp-<target>.tar.gz` — the MCP stdio server |
+| [`Casks/repotory.rb`](Casks/repotory.rb) | `repotory` | macOS | `repotory-darwin-<arch>.dmg` — the Wails desktop app |
+| [`Casks/repotory-mcp.rb`](Casks/repotory-mcp.rb) | `repotory-mcp` | macOS | `repotory-mcp-<target>.tar.gz` — the MCP stdio server |
+| [`Formula/repotory-mcp.rb`](Formula/repotory-mcp.rb) | `repotory-mcp` | macOS + Linux | `repotory-mcp-<target>.tar.gz` — the MCP stdio server |
+
+### Deprecated aliases
+
+`reponest` and `reponest-mcp` are the project's pre-rename names (the app was
+called RepoNest until v2.0.0). They are kept as aliases so a command saved
+before the rename keeps working — and they now serve the CURRENT release. The
+previous version of those files pointed at RepoNest v1.8.0, so installing them
+silently fetched a six-versions-old build; that is the failure this alias
+policy exists to prevent.
+
+Use the new names:
 
 The desktop app is a GUI bundle, so it ships as a **Cask** and only exists for
 macOS. The MCP server is a single static binary with no UI dependency, so it
@@ -20,10 +32,10 @@ installs cleanly on every platform Homebrew supports and ships as a **Formula**.
 brew tap sky-jiangcheng/repo
 
 # Desktop app (macOS)
-brew install --cask sky-jiangcheng/repo/reponest
+brew install --cask sky-jiangcheng/repo/repotory
 
 # MCP server (macOS and Linux)
-brew install sky-jiangcheng/repo/reponest-mcp
+brew install sky-jiangcheng/repo/repotory-mcp
 ```
 
 After installing the MCP server, register it with an AI client:
@@ -49,7 +61,7 @@ different file, and a digest taken from it would reject every real download.
 ## Maintenance
 
 The manifests in this repository are generated from
-[`packaging/homebrew/`](https://github.com/sky-jiangcheng/RepoNest/tree/master/packaging/homebrew)
+[`packaging/homebrew/`](https://github.com/sky-jiangcheng/repotory/tree/master/packaging/homebrew)
 in the main repository. **Edit them there**, then re-publish; editing here will
 be overwritten on the next release.
 
@@ -57,4 +69,4 @@ The `tests.yml` workflow runs `brew install`, `brew audit --cask` and
 `brew test` against every push, so a broken manifest fails here rather than in
 a user's terminal.
 
-[datadir]: https://github.com/sky-jiangcheng/RepoNest#数据目录
+[datadir]: https://github.com/sky-jiangcheng/repotory#数据目录
