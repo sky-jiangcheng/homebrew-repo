@@ -13,7 +13,7 @@
 # sha256 must be filled after each release is published; Homebrew hard-fails on
 # a mismatch, which is exactly what we want from a placeholder.
 cask "reponest" do
-  version "2.26.0"
+  version "2.27.0"
   name "Repotory"
   desc "Local-first code project context base"
   homepage "https://github.com/sky-jiangcheng/repotory"
@@ -23,12 +23,12 @@ cask "reponest" do
 
   on_arm do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-darwin-arm64.dmg"
-    sha256 "d5bbd06b65c3bea21cd6ddec5f6e14b39055026400b22f0622cafddd3b3c66d3"
+    sha256 "32b0aa950580aa5ba3fd899a077c9c7ab5bff9f231a8d9931eda979316119165"
   end
 
   on_intel do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-darwin-amd64.dmg"
-    sha256 "cb2ec9fede016b7b9758933e74dba4c7614f299a8d5a2c9655b1006e02a768c9"
+    sha256 "2994ecccda6ae2311ba90a8f80812f9a98c8b9318e2e160f6fa0e1ca012080bc"
   end
 
   # The bundle inside the DMG is named after wails.json's `name`
