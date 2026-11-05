@@ -1,11 +1,11 @@
-# DEPRECATED NAME — the project was renamed from RepoNest to Repotory.
+# DEPRECATED NAME — the project was renamed from RepoNest to Cinder.
 #
 # This alias exists so a command saved before the rename keeps working. It
 # serves the CURRENT release: the previous version of this file pointed at
 # RepoNest v1.8.0, so installing it silently fetched a six-versions-old
 # build. Use the new name instead.
 #
-# Repotory desktop app (macOS)
+# Cinder Desktop app (macOS)
 #
 # Version is stamped by scripts/update-manifests.sh from wails.json
 # (info.productVersion) — never edit it by hand.
@@ -13,8 +13,8 @@
 # sha256 must be filled after each release is published; Homebrew hard-fails on
 # a mismatch, which is exactly what we want from a placeholder.
 cask "reponest" do
-  version "2.30.0"
-  name "Repotory"
+  version "2.31.0"
+  name "Cinder Desktop"
   desc "Local-first code project context base"
   homepage "https://github.com/sky-jiangcheng/repotory"
   # NOTE: no `license` stanza — `license` is a FORMULA method, not a Cask
@@ -23,23 +23,23 @@ cask "reponest" do
 
   on_arm do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-darwin-arm64.dmg"
-    sha256 "29070197d186b6ac401050da71fbc8de7dd566763ffa8fb4ba6cee06cb2abbaf"
+    sha256 "30b59f2b8a521247c51fbcad8d53065f3fe803f6a3e736ba483d045243ccab7d"
   end
 
   on_intel do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-darwin-amd64.dmg"
-    sha256 "6ca5a314bb8625558c9b9617f537fe4321c1f34c8330f2ade1aa8f51f143ca51"
+    sha256 "2155c75cb893a33d1ad6b7f916032139c265c17f58b249da4e88b9b85cba33de"
   end
 
   # The bundle inside the DMG is named after wails.json's `name`
-  # ("Repotory"), NOT after the `outputfilename` ("repotory"): the build
-  # produces build/bin/Repotory.app and create-dmg ships that bundle as-is.
+  # ("Cinder"), NOT after the `outputfilename` ("repotory"): the build
+  # produces build/bin/Cinder.app and create-dmg ships that bundle as-is.
   # macOS volumes are case-insensitive by default, so an earlier spelling
   # resolved anyway — but a case-sensitive volume would not find it, and the
   # tap's tests.yml asserts the installed path, so the two must agree
   # exactly. The BINARY inside the bundle stays "repotory" (a frozen
   # identifier); only the bundle directory carries the display name.
-  app "Repotory.app"
+  app "Cinder.app"
 
   # Application Support and Logs paths come from internal/platform; they are
   # where GetDbPath() and GetLogPath() point on macOS. A bundle-identifier

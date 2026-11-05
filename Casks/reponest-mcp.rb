@@ -1,21 +1,21 @@
-# DEPRECATED NAME — the project was renamed from RepoNest to Repotory.
+# DEPRECATED NAME — the project was renamed from RepoNest to Cinder.
 #
 # This alias exists so a command saved before the rename keeps working. It
 # serves the CURRENT release: the previous version of this file pointed at
 # RepoNest v1.8.0, so installing it silently fetched a six-versions-old
 # build. Use the new name instead.
 #
-# Repotory MCP server (macOS)
+# Cinder MCP server (macOS)
 #
-# The MCP stdio server is the AI execution interface for Repotory — the desktop
+# The MCP stdio server is the AI execution interface for Cinder — the desktop
 # app is not required to use it, it reads the same local SQLite database.
 #
 # Version is stamped by scripts/update-manifests.sh from wails.json
 # (info.productVersion) — never edit it by hand.
 cask "reponest-mcp" do
-  version "2.30.0"
-  name "Repotory MCP Server"
-  desc "MCP stdio server exposing the Repotory local knowledge base to AI agents"
+  version "2.31.0"
+  name "Cinder MCP Server"
+  desc "MCP stdio server exposing the Cinder local knowledge base to AI agents"
   homepage "https://github.com/sky-jiangcheng/repotory"
   # NOTE: no `license` stanza — `license` is a FORMULA method, not a Cask
   # one. `brew install --cask` rejects the whole definition with
@@ -23,12 +23,12 @@ cask "reponest-mcp" do
 
   on_arm do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-mcp-darwin-arm64.tar.gz"
-    sha256 "a3ca23395126173f39048ce8197886a6ed11ed6958e71d8772fd2eefce5af8ce"
+    sha256 "69141127fcbd6a22b1498006ce8c6177a060ebbe1400c22d5c320cd23db056ad"
   end
 
   on_intel do
     url "https://github.com/sky-jiangcheng/repotory/releases/download/v#{version}/repotory-mcp-darwin-amd64.tar.gz"
-    sha256 "7753bec571507064055215267efe3f951996726924da896d28a0bf3ce01d61a2"
+    sha256 "d8087c790228da185fa3cab848d3c7e03af0c8e90de4589f5e7b0f56889bb005"
   end
 
   # The tarball stages a single bare `repotory-mcp` at its root; `binary` links
