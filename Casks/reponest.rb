@@ -14,7 +14,7 @@
 # sha256 must be filled after each release is published; Homebrew hard-fails on
 # a mismatch, which is exactly what we want from a placeholder.
 cask "reponest" do
-  version "2.33.2"
+  version "2.33.4"
   name "Cinder Desktop"
   desc "Local-first code project context base"
   homepage "https://github.com/sky-jiangcheng/cinder"
@@ -24,12 +24,12 @@ cask "reponest" do
 
   on_arm do
     url "https://github.com/sky-jiangcheng/cinder/releases/download/v#{version}/Cinder-#{version}-darwin-arm64.dmg"
-    sha256 "96c6d5f49ac82e31a4a8d23b499e6fa4cfd362f2b01e36146071750347de599b"
+    sha256 "05f19494ef5d8a87f3e1f7ef256a8f7d0f38156aa7aeb77b1ca4afaa4c37b3d1"
   end
 
   on_intel do
     url "https://github.com/sky-jiangcheng/cinder/releases/download/v#{version}/Cinder-#{version}-darwin-amd64.dmg"
-    sha256 "c38d1bf0df786e1c1a23ff94f698e772abb429b108cee1dd21ae5be11782d35e"
+    sha256 "927f835c9ca3f3ec9b51272aee4dd99c9900e33deace308e3d8a066812a399f2"
   end
 
   # The bundle inside the DMG is named after wails.json's `name`
