@@ -14,7 +14,7 @@
 # Version is stamped by scripts/update-manifests.sh from wails.json
 # (info.productVersion) — never edit it by hand.
 cask "reponest-mcp" do
-  version "2.35.4"
+  version "2.35.5"
   name "Cinder MCP Server"
   desc "MCP stdio server exposing the Cinder local knowledge base to AI agents"
   homepage "https://github.com/sky-jiangcheng/cinder"
@@ -24,12 +24,12 @@ cask "reponest-mcp" do
 
   on_arm do
     url "https://github.com/sky-jiangcheng/cinder/releases/download/v#{version}/cinder-mcp-#{version}-darwin-arm64.tar.gz"
-    sha256 "159d409c77cabae5e578e77bbf84b6243f6ad60c77ba6853001f66fadfd38d62"
+    sha256 "2e5cbd62f5d379086a0186431a2a1dac6a1120e6af0e053f052f8f6adcfd6718"
   end
 
   on_intel do
     url "https://github.com/sky-jiangcheng/cinder/releases/download/v#{version}/cinder-mcp-#{version}-darwin-amd64.tar.gz"
-    sha256 "7993bec4f56f8dd4c83f8be1fb0a35d6b7cb1ed6962ae5651d200515725a4f67"
+    sha256 "b1599fed01bde9590854d46c6756b721df5a9d8bb5c52f7189a36dc2b6779937"
   end
 
   # The tarball stages `cinder-mcp` plus a `repotory-mcp` symlink; `binary`
